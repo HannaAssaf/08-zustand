@@ -15,26 +15,26 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// export const metadata: Metadata = {
-//   title: "08-zustand",
-//   description: "NoteHub App",
-//   openGraph: {
-//     title: `MoteHub 08-zustand`,
-//     description:
-//       "NoteHub Application Optimisation with React Query and Zustand",
-//     url: `https://07-routing-nextjs-olive.vercel.app/`,
-//     siteName: "NoteHub",
-//     images: [
-//       {
-//         url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
-//         width: 1200,
-//         height: 630,
-//         alt: "NoteHub 08-zustand",
-//       },
-//     ],
-//     type: "article",
-//   },
-// };
+export const metadata: Metadata = {
+  title: "08-zustand",
+  description: "NoteHub App",
+  openGraph: {
+    title: `MoteHub 08-zustand`,
+    description:
+      "NoteHub Application Optimisation with React Query and Zustand",
+    url: `https://08-zustand-fawn.vercel.app/`,
+    siteName: "NoteHub",
+    images: [
+      {
+        url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
+        width: 1200,
+        height: 630,
+        alt: "NoteHub 08-zustand",
+      },
+    ],
+    type: "article",
+  },
+};
 
 export default function RootLayout({
   children,

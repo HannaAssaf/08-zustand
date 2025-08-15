@@ -10,7 +10,6 @@ import css from "./page.module.css";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { fetchNotes } from "@/lib/api";
 import { useDebouncedCallback } from "use-debounce";
-import type { Note } from "@/types/note";
 import type { FetchNotesProps } from "@/lib/api";
 
 interface NotesClientProps {
