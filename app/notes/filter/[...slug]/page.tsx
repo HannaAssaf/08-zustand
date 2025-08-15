@@ -2,10 +2,14 @@ import { fetchNotes } from "@/lib/api";
 import NotesClient from "./Notes.client";
 
 type NotesAllProps = {
+  params: Promise<{ slug: string[] }>;
+};
+
+type MetaProps = {
   params: { slug: string[] };
 };
 
-export async function generateMetadata({ params }: NotesAllProps) {
+export async function generateMetadata({ params }: MetaProps) {
   const { slug } = params;
   const filter = slug && slug.length > 0 ? slug.join(", ") : "All";
   return {

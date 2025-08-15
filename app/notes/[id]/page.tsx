@@ -5,7 +5,6 @@ import {
   dehydrate,
 } from "@tanstack/react-query";
 import NoteDetailsClient from "./NoteDetails.client";
-import { date } from "yup";
 
 type Props = {
   params: Promise<{ id: string }>;
