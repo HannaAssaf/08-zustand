@@ -1,15 +1,15 @@
 import { fetchNotes } from "@/lib/api";
 import NotesClient from "./Notes.client";
 
-type NotesAllProps = {
-  params: Promise<{ slug: string[] }>;
-};
+// type NotesAllProps = {
+//   params: Promise<{ slug: string[] }>;
+// };
 
-type MetaProps = {
+type PageProps = {
   params: { slug: string[] };
 };
 
-export async function generateMetadata({ params }: MetaProps) {
+export async function generateMetadata({ params }: PageProps) {
   const { slug } = params;
   const filter = slug && slug.length > 0 ? slug.join(", ") : "All";
   return {
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: MetaProps) {
   };
 }
 
-export default async function NotesAll({ params }: NotesAllProps) {
+export default async function NotesAll({ params }: PageProps) {
   const { slug } = await params;
   const tag = slug[0] === "All" ? undefined : slug[0];
 
