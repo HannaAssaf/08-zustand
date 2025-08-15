@@ -6,11 +6,11 @@ import NotesClient from "./Notes.client";
 // };
 
 type PageProps = {
-  params: { slug: string[] };
+  params: Promise<{ slug: string[] }>;
 };
 
 export async function generateMetadata({ params }: PageProps) {
-  const { slug } = params;
+  const { slug } = await params;
   const filter = slug && slug.length > 0 ? slug.join(", ") : "All";
   return {
     title: `${filter} note list`,
