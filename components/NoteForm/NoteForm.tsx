@@ -1,12 +1,10 @@
-import { Formik, Form, Field, ErrorMessage } from "formik";
-import type { FormikHelpers } from "formik";
+"use client";
 import { useId } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as Yup from "yup";
 import css from "../NoteForm/NoteForm.module.css";
-import { createNote } from "../../lib/api";
-import type { NoteTag } from "../../types/note";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { TagType } from "@/lib/api";
 
 const NoteSchema = Yup.object().shape({
   title: Yup.string()
@@ -19,113 +17,78 @@ const NoteSchema = Yup.object().shape({
     .required("Tag is required"),
 });
 
-interface FormValues {
-  title: string;
-  content: string;
-  tag: NoteTag;
+interface Props {
+  tags: TagType[];
 }
 
-interface NoteFormProps {
-  onCloseModal: () => void;
-}
-
-const formValues: FormValues = {
-  title: "",
-  content: "",
-  tag: "Todo",
-};
-
-export default function NoteForm({ onCloseModal }: NoteFormProps) {
+export default function NoteForm({ tags }: Props) {
   const fieldId = useId();
 
-  const queryClient = useQueryClient();
+  const router = useRouter();
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: createNote,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["notes"],
-      });
-      onCloseModal();
-    },
-    onError() {
-      toast.error("Error creating note.");
-    },
-  });
+  const handleCancel = () => router.push("/notes/filter/All");
 
-  const handleSubmit = (
-    values: FormValues,
-    formikHelpers: FormikHelpers<FormValues>
-  ) => {
-    console.log(values);
-    formikHelpers.resetForm();
-    mutate({
-      title: values.title,
-      content: values.content ? values.content : "",
-      tag: values.tag,
-    });
+  const handleSubmit = async (formData: FormData) => {
+    const rawValues = Object.fromEntries(formData.entries());
+    try {
+      const values = await NoteSchema.validate(rawValues);
+      toast.success("Note created successfully");
+      router.push("/notes/filter/All");
+      console.log(values);
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to create note");
+      }
+    }
   };
 
   return (
-    <Formik
-      initialValues={formValues}
-      onSubmit={handleSubmit}
-      validationSchema={NoteSchema}
-    >
-      <Form className={css.form}>
-        <div className={css.formGroup}>
-          <label htmlFor={`${fieldId}-title`}>Title</label>
-          <Field
-            type="text"
-            name="title"
-            className={css.input}
-            id={`${fieldId}-title`}
-          />
-          <ErrorMessage name="title" component="span" className={css.error} />
-        </div>
+    <form className={css.form} action={handleSubmit}>
+      <div className={css.formGroup}>
+        <label htmlFor={`${fieldId}-title`}>Title</label>
+        <input
+          type="text"
+          name="title"
+          className={css.input}
+          id={`${fieldId}-title`}
+        />
+      </div>
+      <div className={css.formGroup}>
+        <label htmlFor={`${fieldId}-content`}>Content</label>
+        <input
+          type="text"
+          name="content"
+          // rows={8}
+          className={css.textarea}
+          id={`${fieldId}-content`}
+        />
+      </div>
 
-        <div className={css.formGroup}>
-          <label htmlFor={`${fieldId}-content`}>Content</label>
-          <Field
-            as="textarea"
-            name="content"
-            rows={8}
-            className={css.textarea}
-            id={`${fieldId}-content`}
-          />
-          <ErrorMessage name="content" component="span" className={css.error} />
-        </div>
+      <div className={css.formGroup}>
+        <label htmlFor={`${fieldId}-tag`}>Tag</label>
+        <select name="tag" className={css.select} id={`${fieldId}-tag`}>
+          {tags.map((tag) => (
+            <option key={tag.id} value={tag.id}>
+              {tag.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
-        <div className={css.formGroup}>
-          <label htmlFor={`${fieldId}-tag`}>Tag</label>
-          <Field
-            as="select"
-            name="tag"
-            className={css.select}
-            id={`${fieldId}-tag`}
-          >
-            <option value="Todo">Todo</option>
-            <option value="Work">Work</option>
-            <option value="Personal">Personal</option>
-            <option value="Meeting">Meeting</option>
-            <option value="Shopping">Shopping</option>
-          </Field>
-          <ErrorMessage name="tag" component="span" className={css.error} />
-        </div>
-
-        <div className={css.actions}>
-          <button
-            type="button"
-            className={css.cancelButton}
-            onClick={onCloseModal}
-          >
-            Cancel
-          </button>
-          <button type="submit" className={css.submitButton} disabled={false}>
-            {isPending ? "Creating new note..." : "Create Note"}
-          </button>
-        </div>
-      </Form>
-    </Formik>
+      <div className={css.actions}>
+        <button type="submit" className={css.submitButton} disabled={false}>
+          Create Note
+        </button>
+        <button
+          type="button"
+          className={css.cancelButton}
+          onClick={handleCancel}
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
   );
 }
