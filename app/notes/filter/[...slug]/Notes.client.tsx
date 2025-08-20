@@ -4,8 +4,6 @@ import React, { useState } from "react";
 import SearchBox from "@/components/SearchBox/SearchBox";
 import NoteList from "@/components/NoteList/NoteList";
 import Pagination from "@/components/Pagination/Pagination";
-import Modal from "@/components/Modal/Modal";
-import NoteForm from "@/components/NoteForm/NoteForm";
 import css from "./page.module.css";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { fetchNotes } from "@/lib/api";
@@ -20,10 +18,6 @@ interface NotesClientProps {
 
 function NotesClient({ initialData, tag }: NotesClientProps) {
   const [page, setPage] = useState<number>(1);
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
 
   const [searchNote, setSearchNote] = useState<string>("");
 
@@ -57,17 +51,14 @@ function NotesClient({ initialData, tag }: NotesClientProps) {
               onPageChange={setPage}
             />
           )}
-          <Link href="/notes/action/create">Create note +</Link>
+          <Link href="/notes/action/create" className={css.createLink}>
+            Create note +
+          </Link>
         </div>
         {data && data.notes.length > 0 ? (
           <NoteList notes={data.notes} />
         ) : (
           <p>No notes found.</p>
-        )}
-        {isModalOpen && (
-          <Modal onClose={closeModal}>
-            <NoteForm onCloseModal={closeModal} />
-          </Modal>
         )}
       </div>
     </>

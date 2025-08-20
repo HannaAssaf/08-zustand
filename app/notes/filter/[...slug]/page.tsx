@@ -1,10 +1,6 @@
 import { fetchNotes } from "@/lib/api";
 import NotesClient from "./Notes.client";
 
-// type NotesAllProps = {
-//   params: Promise<{ slug: string[] }>;
-// };
-
 type PageProps = {
   params: Promise<{ slug: string[] }>;
 };
