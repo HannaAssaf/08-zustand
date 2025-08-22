@@ -1,25 +1,13 @@
 "use client";
 import { useId } from "react";
-import * as Yup from "yup";
 import css from "../NoteForm/NoteForm.module.css";
 import { toast } from "react-hot-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { TagType, createNote, NewNoteData } from "@/lib/api";
+import { createNote, NewNoteData } from "@/lib/api";
 import type { Metadata } from "next";
 import { useNoteStore } from "@/lib/store/noteStore";
 import { initialDraft } from "@/lib/store/noteStore";
-
-const NoteSchema = Yup.object().shape({
-  title: Yup.string()
-    .min(3, "Title must be at least 3 characters")
-    .max(50, "Title must be at most 50 characters")
-    .required("Title is required"),
-  content: Yup.string().max(500, "Content can be at most 500 characters"),
-  tag: Yup.string()
-    .oneOf(["Todo", "Work", "Personal", "Meeting", "Shopping"])
-    .required("Tag is required"),
-});
 
 export const metadata: Metadata = {
   title: "NoteForm",
@@ -62,6 +50,7 @@ export default function NoteForm() {
         queryKey: ["notes"],
       });
       clearDraft();
+      toast.success("Note created successfully");
       router.push("/notes/filter/All");
     },
     onError() {
@@ -71,21 +60,10 @@ export default function NoteForm() {
 
   const handleCancel = () => router.push("/notes/filter/All");
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = (formData: FormData) => {
     const rawValues = Object.fromEntries(formData) as unknown as NewNoteData;
-    try {
-      const values = await NoteSchema.validate(rawValues);
-      toast.success("Note created successfully");
-      router.push("/notes/filter/All");
-      console.log(values);
-      mutate(rawValues);
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        toast.error(error.message);
-      } else {
-        toast.error("Failed to create note");
-      }
-    }
+    mutate(rawValues);
+    setDraft(rawValues);
   };
 
   return (
@@ -99,6 +77,9 @@ export default function NoteForm() {
           id={`${fieldId}-title`}
           defaultValue={draft ? draft.title : initialDraft.title}
           onChange={handleChange}
+          required
+          minLength={3}
+          maxLength={50}
         />
       </div>
       <div className={css.formGroup}>
@@ -110,6 +91,8 @@ export default function NoteForm() {
           id={`${fieldId}-content`}
           defaultValue={draft ? draft.content : initialDraft.content}
           onChange={handleChange}
+          required
+          maxLength={500}
         />
       </div>
 
