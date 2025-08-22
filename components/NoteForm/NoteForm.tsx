@@ -7,6 +7,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { TagType, createNote, NewNoteData } from "@/lib/api";
 import type { Metadata } from "next";
+import { useNoteStore } from "@/lib/store/noteStore";
+import { initialDraft } from "@/lib/store/noteStore";
 
 const NoteSchema = Yup.object().shape({
   title: Yup.string()
@@ -43,6 +45,15 @@ export default function NoteForm() {
   const fieldId = useId();
   const queryClient = useQueryClient();
   const router = useRouter();
+  const { draft, setDraft, clearDraft } = useNoteStore();
+
+  const handleChange = (
+    event: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    setDraft({ ...draft, [event.target.name]: event.target.value });
+  };
 
   const { mutate, isPending } = useMutation({
     mutationFn: createNote,
@@ -50,14 +61,15 @@ export default function NoteForm() {
       queryClient.invalidateQueries({
         queryKey: ["notes"],
       });
-      router.push("/notes/filter/all");
+      clearDraft();
+      router.push("/notes/filter/All");
     },
     onError() {
       toast.error("Error creating note.");
     },
   });
 
-  const handleCancel = () => router.push("/notes/filter/all");
+  const handleCancel = () => router.push("/notes/filter/All");
 
   const handleSubmit = async (formData: FormData) => {
     const rawValues = Object.fromEntries(formData) as unknown as NewNoteData;
@@ -85,6 +97,8 @@ export default function NoteForm() {
           name="title"
           className={css.input}
           id={`${fieldId}-title`}
+          defaultValue={draft ? draft.title : initialDraft.title}
+          onChange={handleChange}
         />
       </div>
       <div className={css.formGroup}>
@@ -94,12 +108,20 @@ export default function NoteForm() {
           name="content"
           className={css.textarea}
           id={`${fieldId}-content`}
+          defaultValue={draft ? draft.content : initialDraft.content}
+          onChange={handleChange}
         />
       </div>
 
       <div className={css.formGroup}>
         <label htmlFor={`${fieldId}-tag`}>Tag</label>
-        <select name="tag" className={css.select} id={`${fieldId}-tag`}>
+        <select
+          name="tag"
+          className={css.select}
+          id={`${fieldId}-tag`}
+          defaultValue={draft ? draft.tag : initialDraft.tag}
+          onChange={handleChange}
+        >
           <option value="Todo">Todo</option>
           <option value="Work">Work</option>
           <option value="Personal">Personal</option>
