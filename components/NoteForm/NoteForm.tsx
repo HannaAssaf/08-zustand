@@ -84,8 +84,7 @@ export default function NoteForm() {
       </div>
       <div className={css.formGroup}>
         <label htmlFor={`${fieldId}-content`}>Content</label>
-        <input
-          type="text"
+        <textarea
           name="content"
           className={css.textarea}
           id={`${fieldId}-content`}
